@@ -1,0 +1,37 @@
+
+  Implement various selection heuristics (such as DLIS, DLCS, MOM,
+  Jeroslow-Wang) and compare them (e.g.\ by overlaying cactus plots).
+
+
+h_k(a) := #Vorkommen von a in Klauseln der Größe k
+h(a) := sum h_k(a)
+
+
+DLIS (dynamic largest individual sum):
+wähle a mit h(a) maximal, setze a := true.
+(Möglichst viele Klauseln erfüllt)
+Setze a := false
+(Möglichst viele Klauseln kleiner).
+
+
+DLCS (dynamic largest combined sum):
+Wähle a mit h(a) + h(¬a) maximal,
+setze a := true falls h(a) >= h(¬a), a := false
+sonst (Möglichst viele Klauseln erfüllt in beiden Zweigen)
+
+
+MOM: Maximum Occurrences in clauses of Minimum Size
+
+(h_l(x) + h_l(¬x)) * 2^a + h_l(x) * h_l(¬x)
+
+a groß genug, l minimale vorkommende Länge.
+-> Wähle Variablen die am häufigsten in kürzen Klauseln auftreten
+-> Wähle unter diesen die bei denen sich h(a) und h(¬a) möglichst
+   wenig unterscheiden.
+
+
+Jeroslow-Wang:
+
+Wähle x mit maximalem Wert:
+  J(x) = sum_{x \in c, c \in F} 2^{-|c|}
+assign variables with high occurrence in short clauses

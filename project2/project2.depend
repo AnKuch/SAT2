@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1544099046 source:/home/andrea/Dokumente/SatSolving/project2/FileRead.cpp
+	"FileRead.h"
+	<fstream>
+	<iostream>
+
+1544132246 /home/andrea/Dokumente/SatSolving/project2/include/FileRead.h
+	<iostream>
+	<fstream>
+	<vector>
+	"main.h"
+
+1544099560 /home/andrea/Dokumente/SatSolving/project2/include/main.h
+	"FileRead.h"
+
+1544131115 source:/home/andrea/Dokumente/SatSolving/project2/main.cpp
+	<iostream>
+	"main.h"
+
