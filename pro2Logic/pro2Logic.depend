@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1544983406 source:/home/andrea/Dokumente/SatSolving/pro2Logic/main.cpp
+1545060464 source:/home/andrea/Dokumente/SatSolving/pro2Logic/main.cpp
 	<iostream>
 	<fstream>
 	<vector>
@@ -9,9 +9,12 @@
 1544900237 source:/home/andrea/Dokumente/SatSolving/pro2Logic/src/Literal.cpp
 	"Literal.h"
 
-1544900726 /home/andrea/Dokumente/SatSolving/pro2Logic/include/Literal.h
+1545051895 /home/andrea/Dokumente/SatSolving/pro2Logic/include/Literal.h
+	<vector>
+	"Clause.h"
+	"Clauselist.h"
 
-1544900237 source:/home/andrea/Dokumente/SatSolving/pro2Logic/Literal.cpp
+1545051864 source:/home/andrea/Dokumente/SatSolving/pro2Logic/Literal.cpp
 	"Literal.h"
 
 1544900759 source:/home/andrea/Dokumente/SatSolving/pro2Logic/Literallist.cpp
@@ -20,14 +23,15 @@
 1544900669 /home/andrea/Dokumente/SatSolving/pro2Logic/include/Literallist.h
 	"Literal.h"
 
-1544983592 source:/home/andrea/Dokumente/SatSolving/pro2Logic/src/Clause.cpp
+1545042930 source:/home/andrea/Dokumente/SatSolving/pro2Logic/src/Clause.cpp
 	"Clause.h"
 
-1544983562 /home/andrea/Dokumente/SatSolving/pro2Logic/include/Clause.h
+1545044009 /home/andrea/Dokumente/SatSolving/pro2Logic/include/Clause.h
 	<vector>
 
-1544901247 source:/home/andrea/Dokumente/SatSolving/pro2Logic/src/Clauselist.cpp
+1545051725 source:/home/andrea/Dokumente/SatSolving/pro2Logic/src/Clauselist.cpp
 	"Clauselist.h"
+	<iostream>
 
 1544968760 /home/andrea/Dokumente/SatSolving/pro2Logic/include/Clauselist.h
 	"Clause.h"

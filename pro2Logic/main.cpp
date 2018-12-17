@@ -15,6 +15,9 @@ void readfile(string);
 void readClauses(string, Clause*);
 bool solve();
 bool emptClause();
+void set_belToClauses(Clause *);
+void unit_propagation();
+void litSet(int);
 
 std::string word;
 std::string rest;
@@ -26,9 +29,11 @@ std::vector <int> numLitCla2;
 bool error =false;
 int length;
 Clauselist listc;
-vector<int> listl;
-int clacount = 1;
+Literallist listl;
+int clacount = 0;
+int litcount = 0;
 vector<int> listbel;
+vector<pair<string,int>> aktivities;
 
 int main()
 {
@@ -58,8 +63,193 @@ bool solve()
     }
     else
     {
-        cout << "weiter" << endl;
+        unit_propagation();
+        while(1)
+        {
+            Clause *object;
+            int li;
+            //Finden der kleinsten Klausel
+            for(int i=2;i<=numVal;i++)
+            {
+                int ret=false;
+                for(object=listc.begin();object!=0;object=object->next())
+                {
+                    int x = object->get_numberAct();
+                    if(x==i)
+                    {
+                        li= object->get_lit()[0];
+                        ret = true;
+                        break;
+                    }
+                    else continue;
+                }
+                if(ret)
+                {
+                    break;
+                }
+            }
+            litSet(li);
+            aktivities.push_back(make_pair("chooseLi",li));
+            unit_propagation();
+            for(int i=2;i<=numVal;i++)
+            {
+                int ret=false;
+                for(object=listc.begin();object!=0;object=object->next())
+                {
+                    int x = object->get_numberAct();
+                    if(x==i)
+                    {
+                        li= object->get_lit()[0];
+                        ret = true;
+                        break;
+                    }
+                    else continue;
+                }
+                if(ret)
+                {
+                    break;
+                }
+            }
+            litSet(li);
+            unit_propagation();
+            cout << "aktivities: " << aktivities[0].first << ": " <<aktivities[0].second << endl;
+            cout << "aktivities: " << aktivities[1].first << ": " <<aktivities[1].second << endl;
+            cout << "aktivities: " << aktivities[2].first << ": " <<aktivities[2].second << endl;
+            break;
+        }
         return true;
+    }
+}
+
+/*
+Unitpropagation:
+Finden von Clauses mit nur einem aktiven Literal
+Wenn gefunden:
+- Finden des aktiven Literals: unitcl (= pos/neg)
+- Gefundenes Literal in aktivierte Belegung speichern(listbel)
+- Variable herausfinden: positive Zahl von unitcl (= val)
+- Finden von Caluses, in denen unitcl neg vor kommt
+	- wenn unitcl = neg => clauses auf set u. Flag = val
+	- wenn unitcl = pos => aktive lit in clauses -1
+- Finden von Clauses, in denen unitcl pos vor kommt.
+	- wenn unitcl = pos => clauses auf set u. Flag = val
+	- wenn unitcl = neg => aktive lit in clauses -1
+- unitpropagation in aktivities speichern
+*/
+void unit_propagation()
+{
+    Clause *object;
+    int unitcl;
+    bool ret=false;
+    //Finden von Clauses mit nur einem aktiven Literal
+    for(object=listc.begin();object!=0;object=object->next())
+    {
+        if(object->get_numberAct()==1)
+        {
+            //Finden des aktiven Literals: unitcl
+            for(int i=0; i<=(object->get_lit().size());i++)
+            {
+                int x = object->get_lit()[i];
+                for(int j= 0; j<=listbel.size();j++)
+                {
+                    if(x!=listbel[j])
+                    {
+                        unitcl=x;
+                        litSet(unitcl);
+                        ret = true;
+                        break;
+                    }
+                    else continue;
+                }
+                if(ret) break;
+            }
+            aktivities.push_back(make_pair("unitp",unitcl)); //unitpropagation in aktivities speichern
+        }
+        else continue;
+    }
+}
+
+void litSet(int cl)
+{
+    //Gefundenes Literal in aktivierte Belegung speichern(listbel)
+    listbel.push_back(cl);
+    int val; //Variable herausfinden: positive Zahl von unitcl (= val)
+    if(cl<0) val=cl*(-1);
+    else val=cl;
+    Literal *objectl;
+    for(objectl=listl.begin();objectl!=0;objectl=objectl->next())
+    {
+        if(objectl->get_nr()==val)
+        {
+            //unitcl = neg
+            if(cl<0)
+            {
+                objectl->set_value(0);
+                Clause *objectc;
+                for(objectc=listc.begin();objectc!=0;objectc=objectc->next())
+                {
+                    int x = objectc->get_nr();
+                    //Finden von Caluses, in denen unitcl neg vor kommt
+                    for(int i=0;i<=objectl->get_neg().size();i++)
+                    {
+                        int y=objectl->get_neg()[i];
+                        if(x==y)
+                        {
+                            objectc->set_flag(val); //clauses auf set u. Flag = val
+                        }
+                        else continue;
+                    }
+                    //Finden von Clauses, in denen unitcl pos vor kommt.
+                    for(int i=0;i<=objectl->get_pos().size();i++)
+                    {
+                        int y=objectl->get_pos()[i];
+                        if(x==y)
+                        {
+                            objectc->set_numberAct(-1); //aktive lit in clauses -1
+                        }
+                        else continue;
+                    }
+                }
+                break;
+            }
+            //unitcl = pos
+            else if(cl>0)
+            {
+                objectl->set_value(1);
+                Clause *objectc;
+                for(objectc=listc.begin();objectc!=0;objectc=objectc->next())
+                {
+                    int x = objectc->get_nr();
+                    //Finden von Clauses, in denen unitcl pos vor kommt.
+                    for(int i=0;i<=objectl->get_pos().size();i++)
+                    {
+                        int y=objectl->get_pos()[i];
+                        if(x==y)
+                        {
+                            objectc->set_flag(val);//clauses auf set u. Flag = val
+                        }
+                        else continue;
+                    }
+                    //Finden von Caluses, in denen unitcl neg vor kommt
+                    for(int i=0;i<=objectl->get_neg().size();i++)
+                    {
+                        int y=objectl->get_neg()[i];
+                        if(x==y)
+                        {
+                            objectc->set_numberAct(-1); //aktive lit in clauses -1
+                        }
+                        else continue;
+                    }
+                }
+                break;
+            }
+            else
+            {
+                cout << "Error in Clauses!" << endl;
+                break;
+            }
+        }
+        else continue;
     }
 }
 
@@ -94,7 +284,8 @@ void readfile(string a)
             }
             else if(line[0] == '-' || (line[0] > '0' && line[0]<='9'))
             {
-                Clause *clause = new Clause(clacount);
+                Clause *clause = new Clause(clacount+1);
+                clacount++;
                 listc.insert(clause);
                 readClauses(line, clause);
             }
@@ -128,6 +319,11 @@ void readfile(string a)
                     }
                 }
                 numCla = retIntFromString(line, &error);
+                for (int i=0;i<=numVal; i++)
+                {
+                    Literal *object = new Literal(i);
+                    listl.insert(object);
+                }
                 if(error)
                 {
                     cout << "Error in line 'p cnf Var Cla'" << endl;
@@ -149,133 +345,6 @@ void readfile(string a)
             file2.close();
         }
     }
-/*         if ( file.eof ( ) )
- *         {
- *             cout << "\n";
- *             cout << "CNF_DATA_READ - Fatal error!\n";
- *             cout << "  Error3 while reading the file.\n";
- *             exit ( 1 );
- *         }
- *
- *         if ( line[0] == 'c' || line[0] == 'C' )
- *         {
- *             cout << "C linie" << endl;
- *             continue;
- *         }
- *         if (0 == lastblank ( line ))
- *         {
- *             cout << "leere linie" << endl;
- *             continue;
- *         }
- *
- *             // expecting line p cnf numVal numCla
- *         if ( line[0] != 'p' && line[0] != 'P' )
- *         {
- *             cout << "\n";
- *             cout << "CNF_DATA_READ - Fatal error!\n";
- *             cout << "The first non-blank and non-comment line does not start with 'p'." << endl;
- *             exit ( 1 );
- *         }
- *         if ( line[1] != ' ' )
- *         {
- *             cout << "\n";
- *             cout << "CNF_DATA_READ - Fatal error!\n";
- *             cout << "'p' must be followed by a whitespace." << endl;
- *             exit ( 1 );
- *         }
- *         //
- *         //  Remove the first two characters and shift left.
- *         //
- *
- *         line[0] = ' ';
- *         line[1] = ' ';
- *         line = stAdjust ( line );
- *         //
- *         //  Expect the string 'CNF'
- *         //
- *         if ((line[0] == 'c' ) && ( line[1] == 'n' ) && ( line[2] == 'f' ) )
- *         {
- *             cout << line[0] << endl;
- *         }
- *         else
- *         {
- *             cout << "\n";
- *             cout << "CNF_DATA_READ - Fatal error!\n";
- *             cout << "'p ' must be followed by 'cnf'";
- *             exit ( 1 );
- *         }
- *         if (line[3] != ' ')
- *         {
- *             cout << "\n";
- *             cout << "CNF_DATA_READ - Fatal error!\n";
- *             cout << "'p cnf' must be followed by a whitespace.";
- *             exit(1);
- *         }
- *         //
- *         //  Remove the first two characters and shift left.
- *         //
- *         line[0] = ' ';
- *         line[1] = ' ';
- *         line[2] = ' ';
- *         line[3] = ' ';
- *         line = stAdjust (line);
- *
- *         //Reads next word (= number of variables)
- *         sscanf(line.c_str(), "%d %d", &numVal, &numCla);
- *
- *         cout << "NumVal: " << numVal << "NumCla: " << numCla << endl;
- *     }
- */
-
-//        //Reads rest of lines (ignores '0')
-//
-//        numLit = 0;
-//        numCla =0;
-//        numLitCla=0;
-//
-//        while(1)
-//        {
-//            getline(file, line);
-//            if(file.eof())
-//            {
-//                break;
-//            }
-//            if(line[0] == 'c' || line[0] == 'C')
-//            {
-//                continue;
-//            }
-//            if(lengNonBl(line) == 0)
-//            {
-//                continue;
-//            }
-//            while(1)
-//            {
-//                extractFirst(line, word, rest);
-//                line = rest;
-//                if(lengNonBl(word) <= 0)
-//                {
-//                    break;
-//                }
-//                valList = retIntFromString(word, &length, &error);
-//                if(error)
-//                {
-//                    break;
-//                }
-//                if ( valList != 0 )
-//                {
-//                    valList2[numLit] = valList;
-//                    numLit = numLit + 1;
-//                    numLitCla = numLitCla + 1;
-//                }
-//                else
-//                {
-//                    numLitCla2[numCla] = numLitCla;
-//                    numCla = numCla + 1;
-//                    numLitCla = 0;
-//                }
-//            }
-//        }
-//        cout << numCla << endl;
         file.close();
 }
 
@@ -288,7 +357,10 @@ void readClauses(string s, Clause *c)
             break;
         }
         int l = retIntFromString(s, &error);
-        listl.push_back(l);
+        c->set_numberAct(1);
+        int val;
+        if(l<0)val=l*(-1);
+        else val=l;
         vector<int>x=c->get_lit();
         x.push_back(l);
         c->set_lit(x);
@@ -308,13 +380,27 @@ void readClauses(string s, Clause *c)
             s[0]=' ';
         }
         s=stAdjust(s);
-        cout << "neues s: " << s<< endl;
-        cout << "Ende readClauses" << endl;
-        int s = c->get_lit()[0];
-        cout << "s: " << s << endl;
-
+        Literal *object;
+        for(object=listl.begin();object!=0;object=object->next())
+        {
+            if(object->get_nr()==val)
+            {
+                if(l<0)
+                {
+                    object->set_pos(c);
+                }
+                else if(l>0)
+                {
+                    object->set_neg(c);
+                }
+                else
+                {
+                    cout << "no value in this clause" << endl;
+                    break;
+                }
+            }
+        }
     }
-
 }
 
 int lastblank(string s)
@@ -448,7 +534,6 @@ string stAdjust ( string s1 )
         for ( i = 0; i < s2.length() - nonblank; i++ )
         {
             s2[i] = s1[i+nonblank];
-            cout << "s2[i]: " << s2[i] << endl;
         }
         for ( i = s2.length() - nonblank; i < s2.length(); i++ )
         {
