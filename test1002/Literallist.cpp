@@ -1,24 +1,23 @@
-#include "Clauselist.h"
-#include <iostream>
+#include "Literallist.h"
 
-Clause *Clauselist::begin(){return start;}
+Literal *Literallist::begin(){return start;}
 
-void Clauselist::insert(Clause *k)
+void Literallist::insert(Literal *k)
 {
     k->suc = start;
     start = k;
 }
 
-Clause* Clauselist::findl(int nam)
+Literal* Literallist::findl(int nam)
 {
-    Clause *fin;
+    Literal *fin;
     for (fin = begin(); fin != 0; fin = fin->next())
         if (fin->get_nr() == nam)
             break;
     return fin;
 }
 
-void Clauselist::remove(int nam)
+void Literallist::remove(int nam)
 {
     if(start!=0)
     {
@@ -32,7 +31,7 @@ void Clauselist::remove(int nam)
         }
         else
         {
-            Clause *fin;
+            Literal *fin;
             for (fin = begin(); fin != 0; fin = fin->next())
             {
                 if(fin->next()->get_nr() != nam && fin->next()->next() == 0)
@@ -47,4 +46,4 @@ void Clauselist::remove(int nam)
     }
 }
 
-bool Clauselist::empty() { return start == 0; }
+bool Literallist::empty() { return start == 0; }

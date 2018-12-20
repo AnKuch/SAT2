@@ -1,11 +1,23 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include "Clauselist.h"
-#include "Literallist.h"
-#include <chrono>
-#include <algorithm>
-#include <sstream>
+/***************************************************************
+ * Name:      test1002App.cpp
+ * Purpose:   Code for Application Class
+ * Author:     ()
+ * Created:   2018-11-28
+ * Copyright:  ()
+ * License:
+ **************************************************************/
+
+#ifdef WX_PRECOMP
+#include "wx_pch.h"
+#endif
+
+#ifdef __BORLANDC__
+#pragma hdrstop
+#endif //__BORLANDC__
+
+#include "test1002App.h"
+#include "test1002Main.h"
+
 
 using namespace std;
 
@@ -38,10 +50,8 @@ int setCl;
 typedef std::chrono::high_resolution_clock Clock;
 
 
-int main()
+std::vector<int> solver(string filename,string dir,string *result)
 {
-    string filename;
-    string line;
     cout << "Welcome to the DPLL SAT Solver" << endl;
     cout << "What cnf file would you like to be solved?" << endl;
     cin >> filename;
@@ -54,7 +64,8 @@ int main()
     std::chrono::nanoseconds duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1);
     if(unsatisfiable)
     {
-        cout << "Unsatifiable!" << endl;
+        return listbel;
+        *result = "unsatisfiable";
     }
     else if(satisfiable)
     {
@@ -74,12 +85,14 @@ int main()
                 outputL.push_back(x);
             }
         }
-        for(int x=outputL.size()-1; x>=0;x--)
-        {
-            cout << outputL[x] << ' ' << endl;
-        }
+        return outputL;
+        *result = "satisfiable";
     }
-    else cout << "ERROR" << endl;
+    else
+    {
+        return listbel;
+        *result = "noResult";
+    }
     fstream fw;
     ifstream fr;
     bool write = true;
@@ -87,6 +100,7 @@ int main()
     if(!fr)
     {
         cout << "ERROR: No Benchmarkfile" << endl;
+        system("pause");
     }
     else
     {
@@ -114,6 +128,7 @@ int main()
         if(!fw)
         {
             cout << "ERROR: No Benchmarkfile" << endl;
+            system("pause");
         }
         else
         {
@@ -122,7 +137,7 @@ int main()
         fw.close();
     }
     else cout << "Bereits gespeichert!" << endl;
-    return 0;
+    system("pause");
 }
 
 void solve()
@@ -809,4 +824,5 @@ string stAdjust ( string s1 )
     }
     return s2;
 }
+
 

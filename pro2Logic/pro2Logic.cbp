@@ -36,6 +36,15 @@
 		</Compiler>
 		<Unit filename="Literal.cpp" />
 		<Unit filename="Literallist.cpp" />
+		<Unit filename="benchmark">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="benchmark.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="benchmark.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="include/Clause.h" />
 		<Unit filename="include/Clauselist.h" />
 		<Unit filename="include/Literal.h" />
